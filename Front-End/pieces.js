@@ -6,9 +6,7 @@ const pieces = await reponse.json();
  * Creation des fiches produit
  */
 
-
 for (let i = 0; i < pieces.length; i++) {
-
 	const article = pieces[i]; // va chercher la piece dans le fichier JSON.
 	const sectionFiches = document.querySelector('.fiches');
 	const pieceElement = document.createElement('article');
@@ -21,18 +19,21 @@ for (let i = 0; i < pieces.length; i++) {
 	nomElement.innerText = article.nom;
 
 	const prixElement = document.createElement('p');
-	prixElement.innerText = `Prix: ${article.prix} € (${article.prix < 35 ? '€' : '€€€'
-		})`;
-	
+	prixElement.innerText = `Prix: ${article.prix} € (${
+		article.prix < 35 ? '€' : '€€€'
+	})`;
+
 	const categorieElement = document.createElement('p');
 	categorieElement.innerText = article.categorie ?? 'Aucune catégorie'; // opérateur nullish permet de tester l'absence de categorie pour éviter null ou undefined.
 
 	const descriptionElement = document.createElement('p');
 	descriptionElement.innerText =
 		article.decription ?? 'Pas de description pour le moment';
-	
+
 	const stockElement = document.createElement('p');
-	stockElement.innerText = article.disponibilite ? 'En stock' : 'En rupture de stock';
+	stockElement.innerText = article.disponibilite
+		? 'En stock'
+		: 'En rupture de stock';
 
 	// rattachement des balises :
 	sectionFiches.appendChild(pieceElement);
@@ -43,3 +44,14 @@ for (let i = 0; i < pieces.length; i++) {
 	pieceElement.appendChild(descriptionElement);
 	pieceElement.appendChild(stockElement);
 }
+
+//Bouton tri croissant :
+
+const btnTrier = document.querySelector('.btn-trier');
+btnTrier.addEventListener('click', () => {
+	const piecesOrdonnees = Array.from(pieces); // permet de garder l'ordre d'origine malgrès la modification du tableau.
+	piecesOrdonnees.sort((a, b) => {
+		return a.prix - b.prix;
+	});
+	console.log(piecesOrdonnees);
+});
