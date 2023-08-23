@@ -1,3 +1,5 @@
+import { ajoutListenersAvis } from './avis.js'; // import de la fonction depuis avis.js
+
 // Récupération des pièces depuis le fichier JSON
 const reponse = await fetch('pieces-autos.json');
 const pieces = await reponse.json();
@@ -5,48 +7,57 @@ const pieces = await reponse.json();
 /**
  * Creation des fiches produit
  */
+const genererPieces = (pieces) => {
+	for (let i = 0; i < pieces.length; i++) {
+		const article = pieces[i]; // va chercher la piece dans le fichier JSON.
+		// Récupération de l'élément du DOM qui accueillera les fiches
+		const sectionFiches = document.querySelector('.fiches');
+		// Création d’une balise dédiée à une pièce automobile
+		const pieceElement = document.createElement('article');
 
-for (let i = 0; i < pieces.length; i++) {
-	const article = pieces[i]; // va chercher la piece dans le fichier JSON.
-	const sectionFiches = document.querySelector('.fiches');
-	const pieceElement = document.createElement('article');
+		// creation des balises :
+		const imageElement = document.createElement('img');
+		imageElement.src = article.image;
 
-	// creation des balises :
-	const imageElement = document.createElement('img');
-	imageElement.src = article.image;
+		const nomElement = document.createElement('h2');
+		nomElement.innerText = article.nom;
 
-	const nomElement = document.createElement('h2');
-	nomElement.innerText = article.nom;
+		const prixElement = document.createElement('p');
+		prixElement.innerText = `Prix: ${article.prix} € (${
+			article.prix < 35 ? '€' : '€€€'
+		})`;
 
-	const prixElement = document.createElement('p');
-	prixElement.innerText = `Prix: ${article.prix} € (${
-		article.prix < 35 ? '€' : '€€€'
-	})`;
+		const categorieElement = document.createElement('p');
+		categorieElement.innerText = article.categorie ?? 'Aucune catégorie'; // opérateur nullish permet de tester l'absence de categorie pour éviter null ou undefined.
 
-	const categorieElement = document.createElement('p');
-	categorieElement.innerText = article.categorie ?? 'Aucune catégorie'; // opérateur nullish permet de tester l'absence de categorie pour éviter null ou undefined.
+		const descriptionElement = document.createElement('p');
+		descriptionElement.innerText =
+			article.decription ?? 'Pas de description pour le moment';
 
-	const descriptionElement = document.createElement('p');
-	descriptionElement.innerText =
-		article.decription ?? 'Pas de description pour le moment';
+		const stockElement = document.createElement('p');
+		stockElement.innerText = article.disponibilite
+			? 'En stock'
+			: 'En rupture de stock';
 
-	const stockElement = document.createElement('p');
-	stockElement.innerText = article.disponibilite
-		? 'En stock'
-		: 'En rupture de stock';
+		const avisBouton = document.createElement('button');
+		avisBouton.dataset.id = article.id;
+		avisBouton.textContent = 'Afficher les avis';
 
-	// rattachement des balises :
-	sectionFiches.appendChild(pieceElement);
-	pieceElement.appendChild(imageElement);
-	pieceElement.appendChild(nomElement);
-	pieceElement.appendChild(prixElement);
-	pieceElement.appendChild(categorieElement);
-	pieceElement.appendChild(descriptionElement);
-	pieceElement.appendChild(stockElement);
-}
+		// rattachement des balises :
+		sectionFiches.appendChild(pieceElement);
+		pieceElement.appendChild(imageElement);
+		pieceElement.appendChild(nomElement);
+		pieceElement.appendChild(prixElement);
+		pieceElement.appendChild(categorieElement);
+		pieceElement.appendChild(descriptionElement);
+		pieceElement.appendChild(stockElement);
+		pieceElement.appendChild(avisBouton);
+	}
+	ajoutListenersAvis(); // fonction importée depuis avis.js
+};
+genererPieces(pieces);
 
-//Bouton tri croissant et decroissant :
-
+// gestion des boutons :
 const btnTrierPrixCroissants = document.querySelector(
 	'.btn-trier__prix-croissant'
 );
@@ -61,7 +72,6 @@ btnTrierPrixCroissants.addEventListener('click', () => {
 const btnTrierPrixDecroissants = document.querySelector(
 	'.btn-trier__prix-decroissant'
 );
-
 btnTrierPrixDecroissants.addEventListener('click', () => {
 	const piecesOrdonnees = Array.from(pieces); // permet de garder l'ordre d'origine malgrès la modification du tableau.
 	piecesOrdonnees.sort((a, b) => {
@@ -74,7 +84,6 @@ btnTrierPrixDecroissants.addEventListener('click', () => {
 const btnFiltrerPrixAbordables = document.querySelector(
 	'.btn-filtrer__prix-abordable'
 );
-
 btnFiltrerPrixAbordables.addEventListener('click', () => {
 	const piecesFiltreesPrix = pieces.filter((piece) => {
 		return piece.prix <= 35;
@@ -86,7 +95,6 @@ btnFiltrerPrixAbordables.addEventListener('click', () => {
 const btnFiltrerNoDescription = document.querySelector(
 	'.btn-filtrer__nodescription'
 );
-
 btnFiltrerNoDescription.addEventListener('click', () => {
 	const piecesFiltreesNoDescription = pieces.filter((piece) => {
 		return piece.description;
@@ -131,5 +139,4 @@ for (let i = 0; i < nomsDisponibles.length; i++) {
 	nomElement.innerText = `${nomsDisponibles[i]} - ${prixDisponibles[i]} €`;
 	disponiblesElement.appendChild(nomElement);
 }
-
 document.querySelector('.disponibles').appendChild(disponiblesElement);
