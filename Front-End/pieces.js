@@ -1,8 +1,11 @@
-import { ajoutListenersAvis } from './avis.js'; // import de la fonction depuis avis.js
+import { ajoutListenersAvis, ajoutListenerEnvoyerAvis } from './avis.js'; // import de la fonction depuis avis.js
 
 // Récupération des pièces depuis le fichier JSON
-const reponse = await fetch('http://localhost:8081/pieces');
+const reponse = await fetch('http://localhost:8081/pieces/');
 const pieces = await reponse.json();
+
+// appel de la fonction pour ajouter le listener au formulaire
+ajoutListenerEnvoyerAvis();
 
 /**
  * Creation des fiches produit
@@ -66,7 +69,6 @@ btnTrierPrixCroissants.addEventListener('click', () => {
 	piecesOrdonnees.sort((a, b) => {
 		return a.prix - b.prix;
 	});
-	console.log(piecesOrdonnees);
 });
 
 const btnTrierPrixDecroissants = document.querySelector(
@@ -77,7 +79,6 @@ btnTrierPrixDecroissants.addEventListener('click', () => {
 	piecesOrdonnees.sort((a, b) => {
 		return b.prix - a.prix;
 	});
-	console.log(piecesOrdonnees);
 });
 
 // bouton filtre des pieces au prix < ou = à 35 € :
@@ -88,7 +89,6 @@ btnFiltrerPrixAbordables.addEventListener('click', () => {
 	const piecesFiltreesPrix = pieces.filter((piece) => {
 		return piece.prix <= 35;
 	});
-	console.log(piecesFiltreesPrix);
 });
 
 // bouton filtre des pieces ayant une description :
@@ -99,7 +99,6 @@ btnFiltrerNoDescription.addEventListener('click', () => {
 	const piecesFiltreesNoDescription = pieces.filter((piece) => {
 		return piece.description;
 	});
-	console.log(piecesFiltreesNoDescription);
 });
 
 // Liste affichant uniquement le nom des pièces abordables :
@@ -109,7 +108,9 @@ for (let i = pieces.length - 1; i >= 0; i--) {
 		noms.splice(i, 1);
 	}
 }
-console.log(noms);
+
+const pElement = document.createElement('p');
+pElement.innerText = 'Pièces abordables';
 
 // afficher la liste des pièces abordables :
 const abordablesElements = document.createElement('ul');
@@ -121,7 +122,10 @@ for (let i = 0; i < noms.length; i++) {
 	abordablesElements.appendChild(nomElement);
 }
 // Ajout de l'en-tête puis de la liste au bloc résultats filtres
-document.querySelector('.abordables').appendChild(abordablesElements);
+document
+	.querySelector('.abordables')
+	.appendChild(pElement)
+	.appendChild(abordablesElements);
 
 // affichage liste des pieces disponibles avec prix :
 const nomsDisponibles = pieces.map((piece) => piece.nom);
@@ -139,4 +143,19 @@ for (let i = 0; i < nomsDisponibles.length; i++) {
 	nomElement.innerText = `${nomsDisponibles[i]} - ${prixDisponibles[i]} €`;
 	disponiblesElement.appendChild(nomElement);
 }
-document.querySelector('.disponibles').appendChild(disponiblesElement);
+
+const pElementDisponible = document.createElement('p');
+pElementDisponible.innerText = 'Pièces disponibles:';
+document
+	.querySelector('.disponibles')
+	.appendChild(pElementDisponible)
+	.appendChild(disponiblesElement);
+
+const inputPrixMax = document.querySelector('#prix-max');
+inputPrixMax.addEventListener('input', function () {
+	const piecesFiltrees = pieces.filter(function (piece) {
+		return piece.prix <= inputPrixMax.value;
+	});
+	document.querySelector('.fiches').innerHTML = '';
+	genererPieces(piecesFiltrees);
+});
