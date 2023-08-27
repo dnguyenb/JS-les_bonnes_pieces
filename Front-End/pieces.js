@@ -11,6 +11,7 @@ ajoutListenerEnvoyerAvis();
  * Creation des fiches produit
  */
 const genererPieces = (pieces) => {
+	
 	for (let i = 0; i < pieces.length; i++) {
 		const article = pieces[i]; // va chercher la piece dans le fichier JSON.
 		// Récupération de l'élément du DOM qui accueillera les fiches
